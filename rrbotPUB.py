@@ -76,7 +76,10 @@ async def assign_random_role(ctx, member):
     if roles:
         random_role = random.choice(roles)
     await member.add_roles(random_role)
-    await member.send(f'Поздравляю, вы получили роль: {random_role.name}')
+    try: 
+        await member.send(f'Поздравляю, вы получили роль: {random_role.name}')
+    except:
+        print(f'Не удалось отправить сообщение о получении роли {member}')
     await ctx.send(f'{ctx.author.mention}, ваша случайная роль: {random_role}')
 
 @bot.command('pm')
