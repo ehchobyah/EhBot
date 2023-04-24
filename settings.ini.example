@@ -1,7 +1,0 @@
-[Bot]
-TOKEN = token
-
-[Server]
-DVACH_CHANNEL_ID = 0
-PM_CHANNEL_ID = 0
-ROLE_CHANNEL_ID = 0
