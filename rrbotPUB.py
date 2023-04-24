@@ -20,10 +20,14 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+def get_message_attachments(message):
+    attachments = [i.url for i in message.attachments]
+    return attachments
+
 @bot.event
 async def on_ready():
     '''Выводит имя бота при готовности'''
-    print(f'Logged in as {bot.user.name}')
+    print(f'Logged in as {bot.user}')
 
 @bot.event
 async def on_message(message):
@@ -32,7 +36,7 @@ async def on_message(message):
         return
 
     if isinstance(message.channel, discord.DMChannel):
-        if not message.content.startswith('!pm'):
+        if not message.content.startswith('!'):
             # Экранируем упоминания
             content = escape_mentions(message.content)
             # Получаем хэш и эмодзи автора сообщения
@@ -40,7 +44,7 @@ async def on_message(message):
             emoj = hash % (10 ** 3) % emoji_list_size
             # Отправляем сообщение в нужный канал
             channel = bot.get_channel(int(config['Server']['DVACH_CHANNEL_ID']))
-            await channel.send(f'Аноним ({hash % (10 ** 4)}:{emoji_list[emoj]}): {content}')
+            await channel.send(f'Аноним ({hash % (10 ** 4)}:{emoji_list[emoj]}): {content}\n{get_message_attachments(message)[0]}')
     else:
         if message.author.guild_permissions.administrator and message.channel == bot.get_channel(int(config['Server']['PM_CHANNEL_ID'])):
             # Проверяем, что автор сообщения имеет права администратора
@@ -75,7 +79,7 @@ async def pm(ctx):
     if isinstance(ctx.channel, discord.DMChannel):
         channel = bot.get_channel(int(config['Server']['PM_CHANNEL_ID']))
         content = escape_mentions(ctx.message.content)
-        await channel.send(f'**Вопрос от {ctx.author.mention}**: {content}')
+        await channel.send(f'**Вопрос от {ctx.author.mention}**: {content}\n{get_message_attachments(ctx.message)[0]}')
 
 async def send_pm_to_author(author, message):
     '''Отправляет ответ автору вопроса'''
@@ -83,7 +87,7 @@ async def send_pm_to_author(author, message):
         rep_message = await message.channel.fetch_message(message.reference.message_id)
         if(len(rep_message.mentions) == 1):
             channel = await rep_message.mentions[0].create_dm()
-            await channel.send(f'Ответ от администратора: {message.content}')
+            await channel.send(f'Ответ от администратора: {message.content}\n{get_message_attachments(message)[0]}')
 
 # Запускаем бота с токеном
 bot.run(str(config['Bot']['TOKEN']))
