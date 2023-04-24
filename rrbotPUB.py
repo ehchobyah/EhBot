@@ -15,6 +15,11 @@ with open('emojis.txt', 'r', encoding='utf-8') as emoji_file:
     emoji_list = [line.strip() for line in emoji_file.readlines()]
 emoji_list_size = len(emoji_list)
 
+# Создаем список флагов
+with open('flags.txt', 'r', encoding='utf-8') as flags_file:
+    flags_list = [line.strip() for line in flags_file.readlines()]
+flags_list_size = len(flags_list)
+
 # Настраиваем бота вместе с намереньями и префиксом
 intents = discord.Intents.default()
 intents.message_content = True
@@ -42,9 +47,10 @@ async def on_message(message):
             # Получаем хэш и эмодзи автора сообщения
             hash = int(hashlib.sha1(message.author.name.encode("utf-8")).hexdigest(), 16)
             emoj = hash % (10 ** 3) % emoji_list_size
+            flag = hash % (10 ** 4) % flags_list_size
             # Отправляем сообщение в нужный канал
             channel = bot.get_channel(int(config['Server']['DVACH_CHANNEL_ID']))
-            await channel.send(f'Аноним ({hash % (10 ** 4)}:{emoji_list[emoj]}): {content}\n{get_message_attachments(message)[0]}')
+            await channel.send(f'Аноним ({emoji_list[emoj]}:{flags_list[flag]}): {content}\n{get_message_attachments(message)[0]}')
     else:
         if message.author.guild_permissions.administrator and message.channel == bot.get_channel(int(config['Server']['PM_CHANNEL_ID'])):
             # Проверяем, что автор сообщения имеет права администратора
