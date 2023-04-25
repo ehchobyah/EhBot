@@ -1,10 +1,15 @@
 import hashlib
 import random
 import configparser
+import json
 
 import discord
 from discord.ext import commands
 from discord.utils import escape_mentions
+
+# read replylist
+with open("replyList.json", "r") as jsonFile:
+    replyList = json.load(jsonFile)
 
 # Читаем настройки из конфигурационного файла
 config = configparser.ConfigParser()
@@ -88,15 +93,21 @@ async def pm(ctx):
     if isinstance(ctx.channel, discord.DMChannel):
         channel = bot.get_channel(int(config['Server']['PM_CHANNEL_ID']))
         content = escape_mentions(ctx.message.content)
-        await channel.send(f'**Вопрос от {ctx.author.mention}**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
-
+        msg = await channel.send(f'**Вопрос**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
+        reply = {'msgId':msg.id,
+                 'authorId':ctx.author.id}
+        replyList.append(reply)
+        with open("replyList.json", "w+") as jsonFile:
+            json.dump(replyList, jsonFile)
+            
 async def send_pm_to_author(author, message):
     '''Отправляет ответ автору вопроса'''
     if message.reference is not None:
-        rep_message = await message.channel.fetch_message(message.reference.message_id)
-        if(len(rep_message.mentions) == 1):
-            channel = await rep_message.mentions[0].create_dm()
-            await channel.send(f'Ответ от администратора: {message.content}\n'+'\n'.join(get_message_attachments(message)))
+        replyMsgId = message.reference.message_id
+        for reply in replyList:
+            if reply['msgId'] == replyMsgId:
+                user = await bot.fetch_user(reply['authorId'])
+                await user.send(f'***Ответ от администратора:*** {message.content}\n'+'\n'.join(get_message_attachments(message)))
 
 # Запускаем бота с токеном
 bot.run(str(config['Bot']['TOKEN']))
