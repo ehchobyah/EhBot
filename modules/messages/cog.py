@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.utils import escape_mentions
 
-from config import CONFIG
+from config import CONFIG, PREFIX
 from utils import get_message_attachments, dm_to_mentioned_user, replyList
 
 
@@ -25,7 +25,7 @@ class Messages(commands.Cog, name="Private message module"):
             msg = await self.pm_channel.send(f'**Вопрос**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
             reply = {'msgId':msg.id,
                     'authorId':ctx.author.id,
-                    'msg': ctx.message.content.replace('!pm','')}
+                    'msg': ctx.message.content.replace(f'{PREFIX}pm','')}
             replyList.append(reply)
             with open("replyList.json", "w+") as jsonFile:
                 json.dump(replyList, jsonFile)
