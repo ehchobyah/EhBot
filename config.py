@@ -1,4 +1,5 @@
 import configparser
+from jinja2 import Environment,FileSystemLoader
 
 PREFIX = "!"
 
@@ -13,3 +14,6 @@ with open('./emojis.txt', 'r', encoding='utf-8') as emoji_file:
 # Создаем список флагов
 with open('./flags.txt', 'r', encoding='utf-8') as flags_file:
     FLAG_LIST = [line.strip() for line in flags_file.readlines()]
+
+# Загрузка окружения для темплейтов
+TEMP_ENV = Environment(loader=FileSystemLoader('templates'))

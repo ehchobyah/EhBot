@@ -3,7 +3,7 @@ from discord.utils import escape_mentions
 from discord.ext import commands
 import hashlib
 
-from config import CONFIG, EMOJI_LIST, FLAG_LIST, PREFIX
+from config import CONFIG, EMOJI_LIST, FLAG_LIST, PREFIX, TEMP_ENV
 from utils import get_message_attachments, dm_to_mentioned_user
 
 
@@ -11,6 +11,7 @@ class Dvach(commands.Cog, name="2ch"):
     """ 2ch module """
 
     def __init__(self, bot: commands.Bot):
+        
         self.bot = bot
         # Получаем канал PM и DVACH
         self.pm_channel = self.bot.get_channel(
@@ -19,6 +20,7 @@ class Dvach(commands.Cog, name="2ch"):
         self.dvach_channel = self.bot.get_channel(
             int(CONFIG['Server']['DVACH_CHANNEL_ID'])
         )
+        self.template = TEMP_ENV.get_template('message.tpl')
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -37,10 +39,12 @@ class Dvach(commands.Cog, name="2ch"):
                 flag = FLAG_LIST[hash % (10 ** 4) % len(FLAG_LIST)]
 
                 # Отправляем сообщение в 2ch канал
-                await self.dvach_channel.send(
-                    f'Аноним ({emoji}:{flag}): {content}\n' +
-                    '\n'.join(get_message_attachments(message))
-                )
+                await self.dvach_channel.send(self.template.render( #type: ignore
+                                    sender="Aноним",
+                                    brackets=(emoji,flag),
+                                    content=content,
+                                    attachments=get_message_attachments(message))) 
+                       
 
 
 async def setup(bot: commands.Bot):
