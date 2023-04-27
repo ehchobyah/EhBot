@@ -2,8 +2,16 @@ import json
 
 from discord.ext import commands
 
-with open("replyList.json", "r") as jsonFile:
-    replyList = json.load(jsonFile)
+'''чтеник файла с вопросами '''
+try:
+    with open("replyList.json", "r") as jsonFile:
+        replyList = json.load(jsonFile)
+
+except:
+    '''создание файла с вопросами, если его не было '''
+    with open("replyList.json", "w+") as jsonFile:
+        jsonFile.write('[]')
+        replyList = json.load(jsonFile)
 
 def get_message_attachments(message):
     ''' возвращает список прикрепленных к сообщению файлов '''
