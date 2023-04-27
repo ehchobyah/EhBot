@@ -1,9 +1,10 @@
 import discord
 from discord.utils import escape_mentions
 from discord.ext import commands
+import discord_webhook
 import hashlib
 
-from config import CONFIG, EMOJI_LIST, FLAG_LIST, PREFIX, TEMP_ENV
+from config import CONFIG, EMOJI_LIST, PREFIX, AVATAR_LIST, TEMP_ENV
 from utils import get_message_attachments, dm_to_mentioned_user
 
 
@@ -21,6 +22,7 @@ class Dvach(commands.Cog, name="2ch"):
             int(CONFIG['Server']['DVACH_CHANNEL_ID'])
         )
         self.template = TEMP_ENV.get_template('message.tpl')
+        self.dvach_webhook = str(CONFIG['Server']['DVACH_CHANNEL_WEBHOOK'])
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -33,18 +35,21 @@ class Dvach(commands.Cog, name="2ch"):
             if not message.content.startswith(PREFIX):
                 # экранируем упоминания
                 content = escape_mentions(message.content)
-                # Хэшируем имя пользователя и присваеваем ему псевдоним в виде эмодзи и флага (хуйня))
-                hash = int( hashlib.sha1(message.author.name.encode("utf-8")).hexdigest(), 16)
+                # Хэшируем имя пользователя и присваеваем ему псевдоним
+                salt = int(CONFIG['Bot']['SALT'])
+                hash = int(hashlib.sha1(str(message.author.id^salt).encode("utf-8")).hexdigest(), 16)
                 emoji = EMOJI_LIST[hash % (10 ** 3) % len(EMOJI_LIST)]
-                flag = FLAG_LIST[hash % (10 ** 4) % len(FLAG_LIST)]
+                webhook_username = str(hash % (10 ** 4)) + emoji
+                webhook_avatar = AVATAR_LIST[hash % (10 ** 3) % len(AVATAR_LIST)]
+                webhook = discord_webhook.DiscordWebhook(url=self.dvach_webhook,
+                                                         username=webhook_username,
+                                                         avatar_url=webhook_avatar)
 
-                # Отправляем сообщение в 2ch канал
-                await self.dvach_channel.send(self.template.render( #type: ignore
-                                    sender="Aноним",
-                                    brackets=(emoji,flag),
+                webhook.content = await self.template.render_async( #type: ignore
                                     content=content,
-                                    attachments=get_message_attachments(message))) 
+                                    attachments=get_message_attachments(message))
                        
+                webhook.execute()
 
 
 async def setup(bot: commands.Bot):

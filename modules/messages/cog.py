@@ -1,9 +1,11 @@
+import json
+
 import discord
 from discord.ext import commands
 from discord.utils import escape_mentions
 
-from config import CONFIG,TEMP_ENV
-from utils import get_message_attachments, dm_to_mentioned_user
+from config import CONFIG, PREFIX, TEMP_ENV
+from utils import get_message_attachments, dm_to_mentioned_user, replyList
 
 
 class Messages(commands.Cog, name="Private message module"):
@@ -22,12 +24,18 @@ class Messages(commands.Cog, name="Private message module"):
     async def pm(self, ctx: commands.Context):
         """ Задай вопрос и жди ответа"""
         if isinstance(ctx.channel, discord.DMChannel):
-            content = escape_mentions(ctx.message.content)
-            await self.pm_channel.send(self.template.render( #type: ignore
-                                sender=f'**Вопрос от {ctx.author.mention}**',
-                                content=content,
-                                attachments=get_message_attachments(ctx.message))) 
-           
+            content = escape_mentions(ctx.message.content).replace('!pm','')
+            msg = await self.pm_channel.send(await self.template.render_async( #type: ignore
+                                                    sender='**Вопрос**',
+                                                    content=content,
+                                                    attachments=get_message_attachments(ctx.message)))
+            # msg = await self.pm_channel.send(f'**Вопрос**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
+            reply = {'msgId':msg.id,
+                    'authorId':ctx.author.id,
+                    'msg': ctx.message.content.replace(f'{PREFIX}pm','')}
+            replyList.append(reply)
+            with open("replyList.json", "w+") as jsonFile:
+                json.dump(replyList, jsonFile)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -41,7 +49,7 @@ class Messages(commands.Cog, name="Private message module"):
             and
             message.author.guild_permissions.administrator
         ):
-            await dm_to_mentioned_user(message)
+            await dm_to_mentioned_user(message,self.bot)
 
 
 async def setup(bot: commands.Bot):

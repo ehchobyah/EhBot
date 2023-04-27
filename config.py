@@ -11,9 +11,9 @@ CONFIG.read("settings.ini")
 with open('./emojis.txt', 'r', encoding='utf-8') as emoji_file:
     EMOJI_LIST = [line.strip() for line in emoji_file.readlines()]
 
-# Создаем список флагов
-with open('./flags.txt', 'r', encoding='utf-8') as flags_file:
-    FLAG_LIST = [line.strip() for line in flags_file.readlines()]
-
 # Загрузка окружения для темплейтов
-TEMP_ENV = Environment(loader=FileSystemLoader('templates'))
+TEMP_ENV = Environment(loader=FileSystemLoader('templates'),enable_async=True)
+
+# Создаем список аватаров
+with open('./avatars.txt', 'r', encoding='utf-8') as flags_file:
+    AVATAR_LIST = [line.strip() for line in flags_file.readlines()]
