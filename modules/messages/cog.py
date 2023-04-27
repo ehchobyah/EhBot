@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from discord.utils import escape_mentions
 
-from config import CONFIG, PREFIX
+from config import CONFIG, PREFIX, TEMP_ENV
 from utils import get_message_attachments, dm_to_mentioned_user, replyList
 
 
@@ -16,13 +16,20 @@ class Messages(commands.Cog, name="Private message module"):
         self.pm_channel = self.bot.get_channel(
             int(CONFIG['Server']['PM_CHANNEL_ID'])
         )
+        self.template = TEMP_ENV.get_template('message.tpl')
+
+
 
     @commands.command()
     async def pm(self, ctx: commands.Context):
         """ Задай вопрос и жди ответа"""
         if isinstance(ctx.channel, discord.DMChannel):
             content = escape_mentions(ctx.message.content).replace('!pm','')
-            msg = await self.pm_channel.send(f'**Вопрос**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
+            msg = await self.pm_channel.send(await self.template.render_async( #type: ignore
+                                                    sender='**Вопрос**',
+                                                    content=content,
+                                                    attachments=get_message_attachments(ctx.message)))
+            # msg = await self.pm_channel.send(f'**Вопрос**: {content}\n'+'\n'.join(get_message_attachments(ctx.message)))
             reply = {'msgId':msg.id,
                     'authorId':ctx.author.id,
                     'msg': ctx.message.content.replace(f'{PREFIX}pm','')}

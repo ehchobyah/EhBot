@@ -17,7 +17,6 @@ class Roles(commands.Cog, name="Roles module"):
         if ctx.channel == self.roles_channel:
             await assign_random_role(ctx, ctx.author)
 
-
 async def assign_random_role(ctx, member):
     """ Присваивает случайную роль участнику сервера """
     server = member.guild

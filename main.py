@@ -9,6 +9,7 @@ intents.message_content = True
 BOT = commands.Bot(command_prefix=PREFIX, intents=intents)
 
 
+
 @BOT.event
 async def on_ready():
     ''' Производит инициализацию '''

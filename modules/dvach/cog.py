@@ -4,7 +4,7 @@ from discord.ext import commands
 import discord_webhook
 import hashlib
 
-from config import CONFIG, EMOJI_LIST, AVATAR_LIST, PREFIX
+from config import CONFIG, EMOJI_LIST, PREFIX, AVATAR_LIST, TEMP_ENV
 from utils import get_message_attachments, dm_to_mentioned_user
 
 
@@ -12,6 +12,7 @@ class Dvach(commands.Cog, name="2ch"):
     """ 2ch module """
 
     def __init__(self, bot: commands.Bot):
+        
         self.bot = bot
         # Получаем канал PM и DVACH
         self.pm_channel = self.bot.get_channel(
@@ -20,6 +21,7 @@ class Dvach(commands.Cog, name="2ch"):
         self.dvach_channel = self.bot.get_channel(
             int(CONFIG['Server']['DVACH_CHANNEL_ID'])
         )
+        self.template = TEMP_ENV.get_template('message.tpl')
         self.dvach_webhook = str(CONFIG['Server']['DVACH_CHANNEL_WEBHOOK'])
 
     @commands.Cog.listener()
@@ -39,9 +41,14 @@ class Dvach(commands.Cog, name="2ch"):
                 emoji = EMOJI_LIST[hash % (10 ** 3) % len(EMOJI_LIST)]
                 webhook_username = str(hash % (10 ** 4)) + emoji
                 webhook_avatar = AVATAR_LIST[hash % (10 ** 3) % len(AVATAR_LIST)]
-                webhook = discord_webhook.DiscordWebhook(url=self.dvach_webhook, username=webhook_username, avatar_url=webhook_avatar)
-                webhook.content = content + '\n' + '\n'.join(get_message_attachments(message))
-                # Отправляем сообщение в 2ch канал
+                webhook = discord_webhook.DiscordWebhook(url=self.dvach_webhook,
+                                                         username=webhook_username,
+                                                         avatar_url=webhook_avatar)
+
+                webhook.content = await self.template.render_async( #type: ignore
+                                    content=content,
+                                    attachments=get_message_attachments(message))
+                       
                 webhook.execute()
 
 
