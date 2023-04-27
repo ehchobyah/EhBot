@@ -2,7 +2,7 @@ import json
 
 from discord.ext import commands
 
-'''чтеник файла с вопросами '''
+'''чтение файла с вопросами '''
 try:
     with open("replyList.json", "r") as jsonFile:
         replyList = json.load(jsonFile)
