@@ -1,9 +1,8 @@
 {%- if reply %}```{{reply}}```{% endif %}
 {%- if sender -%}{{sender}}: {% endif %}{{content}}
-{# дальше идут файлы #}
 {%- if attachments -%}
-  {% for attachment in attachments %}
-    {{- attachment+"\n" -}}
+  {%- for attachment in attachments -%}
+    {{- '\n'+attachment -}}
   {% endfor %}
 {% endif %}
 
