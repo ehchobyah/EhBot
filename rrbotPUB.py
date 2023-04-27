@@ -2,6 +2,8 @@ import hashlib
 import random
 import configparser
 
+from jinja2 import FileSystemLoader,Environment
+
 import discord
 from discord.ext import commands
 from discord.utils import escape_mentions
@@ -25,6 +27,11 @@ intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+
+# Загружаем темплейты
+temp_env = Environment(loader=FileSystemLoader('templates'))
+
+
 def get_message_attachments(message):
     attachments = [i.url for i in message.attachments]
     return attachments
@@ -37,9 +44,10 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     '''Обработчик входных сообщений'''
+    
     if message.author == bot.user:
         return
-
+    message_template = temp_env.get_template('message.tpl')
     if isinstance(message.channel, discord.DMChannel):
         if not message.content.startswith('!'):
             # Экранируем упоминания
@@ -50,7 +58,12 @@ async def on_message(message):
             flag = hash % (10 ** 4) % flags_list_size
             # Отправляем сообщение в нужный канал
             channel = bot.get_channel(int(config['Server']['DVACH_CHANNEL_ID']))
-            await channel.send(f'Аноним ({emoji_list[emoj]}:{flags_list[flag]}): {content}\n'+'\n'.join(get_message_attachments(message)))
+            await channel.send(message_template.render( #type: ignore
+                                emoji=emoji_list[emoj],
+                                flag=flags_list[flag],
+                                content=content,
+                                attachments=get_message_attachments(message))) 
+            # await channel.send(f'Аноним ({emoji_list[emoj]}:{flags_list[flag]}): {content}\n'+'\n'.join(get_message_attachments(message)))
     else:
         if message.author.guild_permissions.administrator and message.channel == bot.get_channel(int(config['Server']['PM_CHANNEL_ID'])):
             # Проверяем, что автор сообщения имеет права администратора
@@ -80,7 +93,7 @@ async def assign_random_role(ctx, member):
         await member.send(f'Поздравляю, вы получили роль: {random_role.name}')
     except:
         print(f'Не удалось отправить сообщение о получении роли {member}')
-    await ctx.send(f'{ctx.author.mention}, ваша случайная роль: {random_role}')
+    await ctx.send(f'# {ctx.author.mention}, ваша случайная роль: {random_role}')
 
 @bot.command('pm')
 async def pm(ctx):
