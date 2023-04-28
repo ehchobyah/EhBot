@@ -28,7 +28,7 @@ async def on_ready():
             print("Failed to load module {}\n{}".format(module, exc))
 
 @BOT.event
-async def on_error():
+async def on_disconnect():
     DRIVER.close()
 
 # Запускаем бота
