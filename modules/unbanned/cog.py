@@ -11,7 +11,6 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
     ''' Узнай разбанили ли ваню или нет? '''
 
     def __init__(self, bot: commands.Bot):
-
         self.bot = bot
         self.unbanned_channel = self.bot.get_channel(
                 int(CONFIG['Server']['UNBANNED_CHANNEL_ID']))
@@ -36,7 +35,6 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
                await self.unbanned_channel.send(f"На момент {time_now}(мск) Ваня все еще в бане😞😔😭😭") 
 
 
-
 async def find_is_channel_unbanned(url):
     DRIVER.get(url)
     try:
@@ -44,7 +42,6 @@ async def find_is_channel_unbanned(url):
         return False
     except Exception:
         return True
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Unbanned(bot))

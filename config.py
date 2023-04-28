@@ -27,5 +27,4 @@ WEBDRIVER_OPTIONS = webdriver.ChromeOptions()
 WEBDRIVER_OPTIONS.add_argument('headless')
 DRIVER = webdriver.Chrome(service=ChromeService(
          ChromeDriverManager().install()),options=WEBDRIVER_OPTIONS)
- 
 DRIVER.implicitly_wait(0.5)
