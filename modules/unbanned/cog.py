@@ -17,7 +17,7 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
         self.url = CONFIG['Server']['TWITCH_URL']
         asyncio.create_task(self.checker())
 
-    @commands.command(aliases = ['un','ban','banned','isbanned','че там с ним','u'])
+    @commands.command(aliases = ['un','ban','banned','isbanned','u'])
     async def unbanned(self, ctx: commands.Context):
         ''' Узнает разбанили ли ваню '''
         if await find_is_channel_unbanned(self.url):
