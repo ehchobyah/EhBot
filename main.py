@@ -1,7 +1,7 @@
 import pathlib
 import discord
 from discord.ext import commands
-from config import CONFIG, PREFIX, DRIVER
+from config import CONFIG, PREFIX
 
 # Инициализируем бота вместе с намерениями
 intents = discord.Intents.default()
@@ -26,10 +26,6 @@ async def on_ready():
         except Exception as e:
             exc = "{}: {}".format(type(e).__name__, e)
             print("Failed to load module {}\n{}".format(module, exc))
-
-@BOT.event
-async def on_disconnect():
-    DRIVER.close()
 
 # Запускаем бота
 BOT.run(str(CONFIG['Bot']['TOKEN']))
