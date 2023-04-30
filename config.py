@@ -17,3 +17,4 @@ TEMP_ENV = Environment(loader=FileSystemLoader('templates'),enable_async=True)
 # Создаем список аватаров
 with open('./avatars.txt', 'r', encoding='utf-8') as flags_file:
     AVATAR_LIST = [line.strip() for line in flags_file.readlines()]
+

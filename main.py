@@ -29,3 +29,4 @@ async def on_ready():
 
 # Запускаем бота
 BOT.run(str(CONFIG['Bot']['TOKEN']))
+

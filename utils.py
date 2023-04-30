@@ -40,4 +40,3 @@ async def dm_to_mentioned_user(message, bot: commands.Bot):
                 file.write(json.dumps(replyList))
         except Exception:
             print('Ошибка! Вы уже отвечали на этот вопрос.')
-                
