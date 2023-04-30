@@ -13,9 +13,9 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
         self.bot = bot
         self.unbanned_channel = self.bot.get_channel(
                 int(CONFIG['Server']['UNBANNED_CHANNEL_ID']))
-        self.streamer_name = CONFIG['Server']['STREAMER_NAME']
-        self.client_id = CONFIG['Server']['CLIENT_ID']
-        self.client_secret = CONFIG['Server']['CLIENT_SECRET']
+        self.streamer_name = CONFIG['TwitchAPI']['STREAMER_NAME']
+        self.client_id = CONFIG['TwitchAPI']['CLIENT_ID']
+        self.client_secret = CONFIG['TwitchAPI']['CLIENT_SECRET']
         asyncio.create_task(self._checker())
 
     @commands.command(aliases = ['un','ban','banned','isbanned','u'])
