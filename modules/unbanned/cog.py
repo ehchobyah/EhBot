@@ -35,7 +35,7 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
 
     async def _checker(self):
         while True:
-            await asyncio.sleep(10)
+            await asyncio.sleep(300)
             
             time_now = datetime.now(tz=MSK()).strftime("%d-%m-%Y %H:%M")
             if await self._find_is_channel_unbanned(self.streamer_name):
