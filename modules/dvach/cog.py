@@ -17,7 +17,6 @@ class Dvach(commands.Cog, name="2ch"):
         )
         self.dvach_category = int(CONFIG['Server']['DVACH_CATEGORY_ID'])
         self.template = TEMP_ENV.get_template('message.tpl')
-        self.dvach_webhook = str(CONFIG['Server']['DVACH_CHANNEL_WEBHOOK'])
 
 
     @commands.command()
