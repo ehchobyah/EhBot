@@ -1,5 +1,5 @@
 from discord.ext import commands
-from config import CONFIG
+from config import CONFIG,MSK
 
 import asyncio 
 from aiohttp import ClientSession
@@ -36,7 +36,8 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
     async def _checker(self):
         while True:
             await asyncio.sleep(300)
-            time_now = datetime.now().strftime("%d-%m-%Y %H:%M")
+            
+            time_now = datetime.now(tz=MSK()).strftime("%d-%m-%Y %H:%M")
             if await self._find_is_channel_unbanned(self.streamer_name):
                 await self.unbanned_channel.send(f"На момент {time_now}(мск) Ваню РАЗБАНИЛИИ🥳🥳🥳🥳\nЗАХОДИИ https://www.twitch.tv/ehchobyah") 
             else:
@@ -58,6 +59,7 @@ class Unbanned(commands.Cog,name="Is Vanja Unbanned?"):
                                    headers={'Authorization':'Bearer '+access_result['access_token'],
                                            'Client-Id':self.client_id}) as result:
                 data = await result.json() 
+                print(data)
                 if data['data'] != []:
                     return True 
                 else:
